@@ -5,8 +5,8 @@ public class Board {
     private boolean isOneFlip;
     private int[] board;
     private boolean[] isRevealed;
-    private int firstRevealI = -1;
-    private int firstRevealJ = -1;
+    private int firstReveal = -1;
+    private int secondReveal = -1;
 
     public Board(int cardCount, boolean isOneFlip) {
         this.isOneFlip = isOneFlip;
@@ -22,6 +22,7 @@ public class Board {
 
         int[] kindUsed = new int[cardKinds];
         for (int i = 0; i < cardCount; i++) {
+            isRevealed[i] = false;
             do {
                 card = Util.getRandomInt(0, cardKinds-1);
             } while (kindUsed[card] >= 2);
@@ -44,49 +45,59 @@ public class Board {
         return true;
     }
 
-    /*
-    public boolean revealSpace(int space) {
-        int i = space / 10 - 1;
-        int j = space % 10 - 1;
-        boolean isMatch = false;
-
-        if (firstRevealI == -1 && firstRevealJ == -1) {
-            firstRevealI = i;
-            firstRevealJ = j;
-            isRevealed[i][j] = true;
-            draw();
-            return false;
-        }
-
-        isRevealed[i][j] = true;
-
-        draw();
-        if (board[i][j] == board[firstRevealI][firstRevealJ]) {
-            Util.println("MATCH!");
-            isMatch = true;
+    public int revealSpace(int space) {
+        isRevealed[space] = true;
+        if (firstReveal == -1) {
+            firstReveal = space;
+            return -1;
         } else {
-            Util.println("no match");
-            isRevealed[i][j] = false;
-            isRevealed[firstRevealI][firstRevealJ] = false;
-            isMatch = false;
+            secondReveal = space;
+            if (board[firstReveal] == board[secondReveal]) {
+                firstReveal = -1;
+                secondReveal = -1;
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+    }
+
+    public void revert() {
+        if (firstReveal == -1 || secondReveal == -1) {
+            return;
         }
 
-        firstRevealI = -1;
-        firstRevealJ = -1;
-        return isMatch;
+        isRevealed[firstReveal] = false;
+        isRevealed[secondReveal] = false;
+
+        firstReveal = secondReveal = -1;
     }
 
     public boolean canChoose() {
-        for (int i = 0; i < this.HEIGHT; i++) {
-            for (int j = 0; j < this.WIDTH; j++) {
-                if (!isRevealed[i][j]) {
-                    return true;
-                }
+        for (int i = 0; i < isRevealed.length; i++) {
+            if (!isRevealed[i]) {
+                return true;
             }
         }
         return false;
     }
 
+    public int getSpace(int space) {
+        if (space > cardCount-1) {
+            return -1;
+        }
+
+        return board[space];
+    }
+
+    public boolean getRevealed(int space) {
+        if (space > cardCount-1) {
+            return false;
+        }
+
+        return isRevealed[space];
+    }
+    /*
     public void draw() {
         String line = "";
         for (int w = 0; w < this.WIDTH; w++) {
