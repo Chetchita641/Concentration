@@ -1,43 +1,42 @@
+package concentration;
+
 public class Board {
-    private final int WIDTH = 5;
-    private final int HEIGHT = 6;
+    private int cardCount;
     private boolean isOneFlip;
-    private int[][] board;
-    private boolean[][] isRevealed;
+    private int[] board;
+    private boolean[] isRevealed;
     private int firstRevealI = -1;
     private int firstRevealJ = -1;
 
-    public Board(boolean isOneFlip) {
+    public Board(int cardCount, boolean isOneFlip) {
         this.isOneFlip = isOneFlip;
-        board = new int[HEIGHT][WIDTH];
-        isRevealed = new boolean[HEIGHT][WIDTH];
+        this.cardCount = cardCount;
+        board = new int[cardCount];
+        isRevealed = new boolean[cardCount];
         this.resetBoard();
     }
 
     public void resetBoard() {
-        int cards = (this.HEIGHT*this.WIDTH)/2;
+        int cardKinds = (cardCount)/2;
         int card;
 
-        int[] cardPlayed = new int[cards];
-        for (int h = 0; h < this.HEIGHT; h++) {
-            for (int w = 0; w < this.WIDTH; w++) {
-                do {
-                    card = Util.getRandomInt(0, cards-1);
-                } while (cardPlayed[card] >= 2);
-                board[h][w] = card;
-                cardPlayed[card]++;
-            }
+        int[] kindUsed = new int[cardKinds];
+        for (int i = 0; i < cardCount; i++) {
+            do {
+                card = Util.getRandomInt(0, cardKinds-1);
+            } while (kindUsed[card] >= 2);
+            board[i] = card;
+            kindUsed[card]++;
         }
+
     }
 
     public boolean isValidSpace(int space) {
-        int i = space / 10;
-        int j = space % 10;
-        if (i < 1 || i > this.HEIGHT || j < 1 || j > this.WIDTH) {
+        if (space < 0 || space > cardCount-1) {
             Util.println("Invalid space selection");
             return false;
         }
-        else if (isRevealed[i][j]) {
+        else if (isRevealed[space]) {
             Util.println("Square has already been revealed. Please choose again.");
             return false;
         }
@@ -45,6 +44,7 @@ public class Board {
         return true;
     }
 
+    /*
     public boolean revealSpace(int space) {
         int i = space / 10 - 1;
         int j = space % 10 - 1;
@@ -109,5 +109,5 @@ public class Board {
             Util.println(line);
         }
     }
-
+    */
 }
